@@ -1,0 +1,9 @@
+{
+  "name": "trailmark",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "A local learning library with a Python API and vanilla JavaScript UI",
+  "scripts": {"test": "node --test tests/*.test.js", "check": "node --check trailmark/static/app.js && node --check trailmark/static/library.js"},
+  "engines": {"node": ">=18"}
+}

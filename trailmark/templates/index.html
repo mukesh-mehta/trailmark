@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A calmer home for the things you want to learn. Save, organize, and revisit your learning resources.">
+  <title>Trailmark — Your learning library</title>
+  <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}" type="image/svg+xml">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script type="module" src="{{ url_for('static', filename='app.js') }}"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to library</a>
+  <aside class="sidebar">
+    <a class="brand" href="/" aria-label="Trailmark home"><span class="brand-mark">t<span>↗</span></span> trailmark<span class="brand-dot">.</span></a>
+    <p class="sidebar-label">YOUR WORKSPACE</p>
+    <nav aria-label="Library views">
+      <button class="nav-item active" data-view="all" aria-current="page"><span>▤</span> All resources <b id="nav-all">0</b></button>
+      <button class="nav-item" data-view="learning"><span>◷</span> In progress <b id="nav-learning">0</b></button>
+      <button class="nav-item" data-view="completed"><span>✓</span> Completed <b id="nav-completed">0</b></button>
+      <button class="nav-item" data-view="favorites"><span>☆</span> Favorites <b id="nav-favorites">0</b></button>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="local-note"><span class="status-dot"></span> Your library, on your device<p>Small steps. Lasting knowledge.</p></div>
+      <button id="theme-toggle" class="theme-button" aria-pressed="false">◐ <span>Switch to dark theme</span></button>
+      <span class="version">TRAILMARK / V0.1</span>
+    </div>
+  </aside>
+
+  <main id="main">
+    <header class="topbar"><span>PERSONAL LEARNING SPACE</span><div class="toolbar"><button id="import-button" class="text-button">↑ Import</button><a href="/api/export" class="text-button" download>↓ Export</a><input id="import-file" type="file" accept="application/json,.json" hidden></div></header>
+    <section class="intro" aria-labelledby="page-title">
+      <div><div class="eyebrow"><span></span> COLLECT CURIOSITY. BUILD KNOWLEDGE.</div><h1 id="page-title">Your next rabbit hole,<br><em>beautifully organized.</em></h1><p>A little less tab clutter. A little more learning.<br>Keep the resources that move you forward, all in one place.</p></div>
+      <div class="intro-action"><span class="hand-note">Make room for a new idea ↙</span><button id="add-resource" class="primary">＋ Add resource</button></div>
+    </section>
+    <section class="stats" aria-label="Library statistics">
+      <div class="stat"><span>Total resources</span><strong id="stat-total">0</strong><small>Your growing collection</small></div>
+      <div class="stat"><span>In progress</span><strong id="stat-learning">0</strong><small>Curiosity in motion</small></div>
+      <div class="stat"><span>Completed</span><strong id="stat-completed">0</strong><small>Knowledge that stays</small></div>
+      <div class="stat completion-stat"><span>Completion rate</span><strong id="stat-rate">0<small>%</small></strong><progress id="completion-progress" max="100" value="0" aria-label="Completion rate"></progress></div>
+    </section>
+    <section class="library" aria-labelledby="library-title">
+      <div class="section-heading"><h2 id="library-title">All resources <span id="result-count">0</span></h2><span class="subtle" id="collection-note">A home for your next discovery</span></div>
+      <div class="filters">
+        <label class="search-box"><span aria-hidden="true">⌕</span><span class="sr-only">Search resources</span><input id="search" type="search" placeholder="Search titles, notes, or tags…" maxlength="300"></label>
+        <label><span class="sr-only">Filter by type</span><select id="kind-filter"><option value="">All types</option><option value="article">Articles</option><option value="video">Videos</option><option value="course">Courses</option><option value="tool">Tools</option><option value="book">Books</option></select></label>
+        <label><span class="sr-only">Filter by status</span><select id="status-filter"><option value="">All statuses</option><option value="queued">To learn</option><option value="learning">In progress</option><option value="completed">Completed</option></select></label>
+        <label><span class="sr-only">Sort resources</span><select id="sort"><option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="title">Title A–Z</option></select></label>
+      </div>
+      <div class="tag-filter-row"><span>EXPLORE</span><div id="tag-filters" aria-label="Filter by tag"></div><button id="clear-filters" class="text-button" hidden>Reset filters</button></div>
+      <div id="load-error" class="error-banner" role="alert" hidden><span></span><button id="retry">Try again</button></div>
+      <div id="cards" class="cards" aria-live="polite"><p class="empty-message">Loading your library…</p></div>
+      <div id="empty-state" class="empty-state" hidden><div class="empty-icon">↗</div><h3>Your next discovery starts here.</h3><p>Save an article, course, video, book, or tool.<br>Give your curiosity somewhere to land.</p><button id="empty-add" class="primary">＋ Save your first resource</button></div>
+      <div id="no-results" class="empty-state" hidden><h3>No matching resources</h3><p>Try a different search or reset your filters.</p><button id="empty-reset" class="secondary">Reset filters</button></div>
+    </section>
+    <footer><span>Made for curious minds.</span><span>Stored locally · No account needed</span></footer>
+  </main>
+
+  <dialog id="resource-dialog" aria-labelledby="dialog-title">
+    <form id="resource-form">
+      <div class="dialog-heading"><div><span class="eyebrow">GROW YOUR LIBRARY</span><h2 id="dialog-title">Save something good.</h2></div><button type="button" class="icon-button" id="close-dialog" aria-label="Close editor">×</button></div>
+      <label>Title<input name="title" required maxlength="160" placeholder="What caught your attention?"></label>
+      <label>Link<input name="url" type="url" required maxlength="2048" placeholder="https://…"></label>
+      <div class="form-row"><label>Type<select name="kind"><option value="article">Article</option><option value="video">Video</option><option value="course">Course</option><option value="tool">Tool</option><option value="book">Book</option></select></label><label>Learning status<select name="status"><option value="queued">To learn</option><option value="learning">In progress</option><option value="completed">Completed</option></select></label></div>
+      <label>Tags <span class="subtle">— comma separated, up to 12</span><input name="tags" maxlength="371" placeholder="python, design, someday"></label>
+      <label>Your notes<textarea name="notes" rows="4" maxlength="10000" placeholder="Why save this? What did you learn?"></textarea></label>
+      <label class="checkbox-label"><input type="checkbox" name="favorite"> Add to favorites</label>
+      <p id="form-error" class="form-error" role="alert" hidden></p>
+      <div class="dialog-actions"><button type="button" class="secondary" id="cancel-dialog">Cancel</button><button type="submit" id="save-resource" class="primary">Save resource</button></div>
+    </form>
+  </dialog>
+  <dialog id="delete-dialog" aria-labelledby="delete-title"><div class="delete-content"><h2 id="delete-title">Remove this resource?</h2><p id="delete-description"></p><p class="subtle">This also removes its notes. This action cannot be undone.</p><div class="dialog-actions"><button id="cancel-delete" class="secondary">Keep resource</button><button id="confirm-delete" class="danger">Remove resource</button></div></div></dialog>
+  <div id="toast" role="status" hidden></div>
+</body>
+</html>
